@@ -204,3 +204,53 @@ Moderate Anxiety captures common exam-related stress and nervousness.
 High Anxiety represents severe emotional distress that can significantly affect academic performance.
 
 This strategy reduces classification complexity while preserving emotional severity and relevance to exam anxiety detection.
+
+# BERT Model Selection & Training Colab(Google Colab)
+The BERT (Bidirectional Encoder Representations from Transformers) model is selected for this project due to its strong performance in contextual text understanding.
+
+Reasons for choosing BERT-Base (bert-base-uncased):
+
+Bidirectional understanding of text
+
+Pretrained on large-scale English corpora
+
+Suitable for text classification tasks
+
+Computationally efficient compared to larger variants
+
+BERT enables the system to understand context, emotional cues, and sentence meaning, which is critical for detecting exam anxiety.
+
+Training BERT models requires GPU acceleration, which may not be available or efficient on local systems. Therefore, Google Colab is used for training because:
+
+Provides free GPU support
+
+Reduces training time significantly
+
+Eliminates local hardware limitations
+
+Ensures reproducibility of training
+
+4.4 — Text Preprocessing with BERT Tokenizer
+
+Before the model can understand text, raw strings need to be converted into numbers that BERT can work with. Here’s what happens:
+
+Token IDs → Every word/subword is converted into a number corresponding to BERT’s vocabulary.
+
+Attention Masks → Helps the model know which tokens are real and which are just padding.
+
+Truncation/Padding → Makes all sequences the same length (so batches can be processed efficiently).
+
+ Why this is important: BERT can’t work with plain strings—it expects fixed-size numerical inputs. This step ensures the data is compatible with the model.
+
+4.5 — Training Setup (train.py)
+
+Once tokenized, the data enters the training loop implemented in PyTorch. Key points:
+
+Component	Details
+Loss Function	Cross-Entropy Loss → standard for classification tasks
+Optimizer	AdamW → popular for transformer models, includes weight decay for better generalization
+Batch Size	Depends on GPU memory (T4 GPU is good for medium batch sizes)
+Epochs	Multiple passes over the dataset → helps model learn better
+Goal	The model learns to map linguistic patterns to anxiety levels
+
+ Tip: Always monitor loss & accuracy per epoch so you know if the model is actually learning. If loss plateaus or spikes, tweak learning rate or batch size.
