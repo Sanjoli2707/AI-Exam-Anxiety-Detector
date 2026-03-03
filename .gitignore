@@ -1,0 +1,12 @@
+# virtual env
+venv/
+
+# python junk
+__pycache__/
+*.pyc
+
+# ML models (VERY IMPORTANT)
+*.pt
+*.pkl
+*.h5
+model/
