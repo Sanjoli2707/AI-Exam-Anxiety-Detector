@@ -114,8 +114,7 @@ with torch.no_grad():
 
 print("Validation Accuracy:", correct / total)
 
-
-# Instead of saving to Drive
-MODEL_PATH = "model/bert_anxiety_model.pt"
+#Its better to save large trained models on drive
+MODEL_PATH = "/content/drive/MyDrive/AI-Anxiety-Data/bert_anxiety_model.pt"
 torch.save(model.state_dict(), MODEL_PATH)
 print(f"Model saved to {MODEL_PATH}")
