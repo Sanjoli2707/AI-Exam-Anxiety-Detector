@@ -14,16 +14,21 @@ tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 class AnxietyDataset(Dataset):
     def __init__(self, csv_path, tokenizer, max_len=128):
         self.df = pd.read_csv(csv_path)
-       
         self.tokenizer = tokenizer
         self.max_len = max_len
+
+        # Map string labels to integers
+        self.label2id = {label: idx for idx, label in enumerate(self.df['status'].unique())}
+        self.id2label = {v: k for k, v in self.label2id.items()}
 
     def __len__(self):
         return len(self.df)
 
     def __getitem__(self, idx):
         text = str(self.df.loc[idx, "text"])
-        label = int(self.df.loc[idx, "status"]) 
+        label_str = self.df.loc[idx, "status"]
+        label = self.label2id[label_str]  # map string to integer
+
         encoding = self.tokenizer(
             text,
             padding="max_length",
@@ -31,6 +36,7 @@ class AnxietyDataset(Dataset):
             max_length=self.max_len,
             return_tensors="pt"
         )
+
         return {
             "input_ids": encoding["input_ids"].squeeze(0),
             "attention_mask": encoding["attention_mask"].squeeze(0),
@@ -53,10 +59,12 @@ val_loader = DataLoader(val_dataset, batch_size=8)
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device:", DEVICE)
 
+num_classes = len(pd.read_csv(DATA_PATH)['status'].unique())
+
 model = BertForSequenceClassification.from_pretrained(
     "bert-base-uncased",
-    num_labels=3,               # keep your number of classes
-    ignore_mismatched_sizes=True  # add this to suppress the UNEXPECTED/MISSING warnings
+    num_labels=num_classes,
+    ignore_mismatched_sizes=True
 )
 model = model.to(DEVICE)
 
