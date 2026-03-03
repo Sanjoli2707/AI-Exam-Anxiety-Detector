@@ -1,3 +1,7 @@
+# Dataset files (ignored)
+data/
+*.csv
+
 # virtual env
 venv/
 
