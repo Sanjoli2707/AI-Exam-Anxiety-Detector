@@ -20,11 +20,13 @@ A dedicated virtual environment is created to ensure isolated and clean dependen
 
 python -m venv venv
 venv\Scripts\activate
+
 2) Library Installation
 
 All required libraries for NLP processing, BERT model integration, backend services, and frontend UI are installed using a centralized requirements.txt file.
 
 pip install -r requirements.txt
+
 3) Environment Validation
 
 The virtual environment is validated to ensure successful installation of key libraries including:
@@ -54,7 +56,8 @@ AI-EXAM-ANXIETY-DETECTOR/
 ├── requirements.txt
 ├── .gitignore
 └── README.md
- GPU and Training Environment
+
+# GPU and Training Environment
 
 Model training and experimentation are performed using Google Colab to leverage GPU acceleration.
 The environment is verified for CUDA availability to support transformer-based model training.
@@ -65,7 +68,7 @@ Git and GitHub are configured for version control and collaborative development.
 Large files such as datasets and trained model weights are excluded using .gitignore to maintain repository hygiene.
 
 ## Dataset Selection and Organization
-Dataset Collection
+1) Dataset Collection
 
 A publicly available mental-health text dataset was obtained from Kaggle. The dataset contains thousands of text statements annotated with emotional and psychological categories including:
 
@@ -88,3 +91,61 @@ An unbalanced dataset to study class distribution
 A feature-engineered dataset not required for BERT-based modeling
 
 Note: Dataset files are excluded from this repository due to licensing and size constraints. Users must download the dataset separately from Kaggle and place the required CSV file inside the data/ directory.
+
+2) DataSet Loading
+To inspect the dataset, a Jupyter Notebook named
+
+01_dataset_inspection.ipynb is created inside the notebooks/ folder.
+
+The dataset is loaded using the Pandas library:
+
+import pandas as pd
+
+df = pd.read_csv("../data/final_anxiety_dataset.csv")
+
+This allows structured analysis and easy visualization of dataset properties.
+
+3) Understanding DataSet Structure
+The dataset mainly consists of two important columns:
+
+statement → Text input written by users
+
+status → Mental health label associated with the text
+
+To understand the dataset size and structure, the following commands are used:
+
+df.head()
+
+df.shape
+
+df.columns
+
+This step confirms:
+
+Number of records
+
+Number of columns
+
+Type of data present.
+
+4) Finding Missing Vaues
+Before training any model, missing values must be identified.
+
+df.isnull().sum()
+
+This step reveals that some text entries may be missing and need to be handled during preprocessing.
+
+5) Class Distribution Analysis
+   The dataset contains multiple mental-health categories, which may not be evenly distributed.
+
+df['status'].value_counts()
+
+This analysis helps identify:
+
+Class imbalance
+
+Dominant mental-health categories
+
+Need for label mapping in later stages
+
+Understanding class distribution is essential to prevent model bias.
