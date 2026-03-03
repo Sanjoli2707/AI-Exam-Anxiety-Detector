@@ -25,7 +25,7 @@ class AnxietyDataset(Dataset):
 
     def __getitem__(self, idx):
         text = str(self.df.loc[idx, "text"])
-        label = int(self.df.loc[idx, "label"])  # always safe now
+        label = int(self.df.loc[idx, "status"]) 
         encoding = self.tokenizer(
             text,
             padding="max_length",
@@ -38,6 +38,7 @@ class AnxietyDataset(Dataset):
             "attention_mask": encoding["attention_mask"].squeeze(0),
             "labels": torch.tensor(label, dtype=torch.long)
         }
+   
 # Load dataset
 DATA_PATH = "/content/drive/MyDrive/AI-Anxiety-Data/mental_health_combined_test.csv"
 dataset = AnxietyDataset(DATA_PATH, tokenizer, MAX_LEN)
