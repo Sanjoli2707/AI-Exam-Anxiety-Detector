@@ -1,3 +1,12 @@
+## Activity 2.6 – Dataset Suitability Assessment
+
+Based on the exploratory analysis of the dataset, the following observations were made:
+
+- The dataset contains a large number of samples, making it suitable for training deep learning models.
+- The text entries contain emotional expressions that can help identify anxiety-related patterns.
+- Multiple mental health categories are present, allowing meaningful classification and grouping.
+
+Therefore, the dataset is considered suitable for building an AI-based exam anxiety detection system using Natural Language Processing (NLP) techniques.
 <img width="839" height="398" alt="image" src="https://github.com/user-attachments/assets/a2f65870-0e89-4978-a30e-4cb98b7a335b" />## Activity 2.5 – Class Distribution Analysis
 
 Class distribution was analyzed using the pandas function `df['status'].value_counts()`.
