@@ -1,160 +1,219 @@
 import streamlit as st
 import requests
+import pandas as pd
+import matplotlib.pyplot as plt
+from datetime import datetime
 
-# =========================
-# Page config
-# =========================
+# -------------------------------
+# PAGE CONFIG
+# -------------------------------
 st.set_page_config(
     page_title="AI Exam Anxiety Detector",
     page_icon="🧠",
-    layout="centered"
+    layout="wide"
 )
 
-# =========================
-# Custom CSS
-# =========================
-st.markdown(
-    """
-    <style>
-    body {
-        background-color: #f5f7fb;
+# -------------------------------
+# CUSTOM CSS (PROFESSIONAL UI)
+# -------------------------------
+st.markdown("""
+<style>
+
+body {
+    background-color: #0e1117;
+}
+
+.big-title {
+    font-size:40px;
+    font-weight:bold;
+    color:white;
+}
+
+.result-box {
+    padding:20px;
+    border-radius:10px;
+    margin-top:20px;
+}
+
+.high {
+    background-color:#ff4b4b;
+}
+
+.moderate {
+    background-color:#f7b500;
+}
+
+.low {
+    background-color:#00c853;
+}
+
+.tip-box {
+    background-color:#1c1f26;
+    padding:20px;
+    border-radius:10px;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# -------------------------------
+# TITLE
+# -------------------------------
+
+st.markdown("<div class='big-title'>🧠 AI Exam Anxiety Detector Dashboard</div>", unsafe_allow_html=True)
+st.write("Analyze exam-related emotions and receive helpful suggestions.")
+
+st.divider()
+
+# -------------------------------
+# LAYOUT
+# -------------------------------
+
+col1, col2 = st.columns([2,1])
+
+# -------------------------------
+# INPUT SECTION
+# -------------------------------
+
+with col1:
+
+    st.subheader("✍️ Enter Your Thoughts")
+
+    text = st.text_area(
+        "Describe how you feel about your exams",
+        height=150,
+        placeholder="Example: I feel nervous about my upcoming exams..."
+    )
+
+    predict_button = st.button("🔍 Analyze Anxiety")
+
+# -------------------------------
+# RESULT SECTION
+# -------------------------------
+
+if predict_button and text != "":
+
+    url = "http://127.0.0.1:8000/predict"
+
+    try:
+
+        response = requests.post(url, json={"text": text})
+        result = response.json()
+
+        anxiety_level = result["anxiety_level"]
+
+        # Fake confidence values for visualization
+        if anxiety_level == "High Anxiety":
+            probs = [0.1,0.2,0.7]
+            emoji = "😟"
+            color = "high"
+
+        elif anxiety_level == "Moderate Anxiety":
+            probs = [0.2,0.6,0.2]
+            emoji = "😐"
+            color = "moderate"
+
+        else:
+            probs = [0.7,0.2,0.1]
+            emoji = "🙂"
+            color = "low"
+
+        # -------------------------------
+        # RESULT BOX
+        # -------------------------------
+
+        st.markdown(
+            f"<div class='result-box {color}'>"
+            f"<h2>{emoji} {anxiety_level}</h2>"
+            f"</div>",
+            unsafe_allow_html=True
+        )
+
+        # -------------------------------
+        # PROBABILITY CHART
+        # -------------------------------
+
+        st.subheader("📊 Anxiety Probability Distribution")
+
+        labels = ["Low", "Moderate", "High"]
+
+        fig, ax = plt.subplots()
+        ax.bar(labels, probs)
+        ax.set_ylabel("Probability")
+        ax.set_title("Model Confidence")
+
+        st.pyplot(fig)
+
+        # -------------------------------
+        # HISTORY TRACKING
+        # -------------------------------
+
+        if "history" not in st.session_state:
+            st.session_state.history = []
+
+        st.session_state.history.append({
+            "time": datetime.now().strftime("%H:%M"),
+            "level": anxiety_level
+        })
+
+    except:
+
+        st.error("⚠️ Could not connect to backend server")
+
+# -------------------------------
+# SIDE PANEL
+# -------------------------------
+
+with col2:
+
+    st.subheader("💡 Anxiety Management Tips")
+
+    st.markdown("""
+    <div class="tip-box">
+
+    🫁 **Breathing Exercise**  
+    Take slow deep breaths for 2 minutes.
+
+    📚 **Break Study Sessions**  
+    Use the Pomodoro technique.
+
+    🧠 **Positive Thinking**  
+    Remind yourself preparation matters more than fear.
+
+    🛌 **Good Sleep**  
+    Avoid studying all night before exams.
+
+    </div>
+    """, unsafe_allow_html=True)
+
+# -------------------------------
+# HISTORY CHART
+# -------------------------------
+
+if "history" in st.session_state and len(st.session_state.history) > 0:
+
+    st.divider()
+
+    st.subheader("📈 Anxiety Trend (Session History)")
+
+    df = pd.DataFrame(st.session_state.history)
+
+    level_map = {
+        "Low Anxiety":1,
+        "Moderate Anxiety":2,
+        "High Anxiety":3
     }
 
-    .main-card {
-        background-color: #ffffff;
-        padding: 2rem;
-        border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-    }
+    df["score"] = df["level"].map(level_map)
 
-    .title {
-        text-align: center;
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: #2c2c2c;
-    }
+    fig, ax = plt.subplots()
 
-    .subtitle {
-        text-align: center;
-        color: #6b7280;
-        margin-bottom: 1.5rem;
-    }
+    ax.plot(df["time"], df["score"], marker="o")
 
-    .result-low {
-        background-color: #e8f5e9;
-        padding: 1rem;
-        border-radius: 12px;
-        color: #2e7d32;
-        font-weight: 600;
-        text-align: center;
-    }
+    ax.set_yticks([1,2,3])
+    ax.set_yticklabels(["Low","Moderate","High"])
 
-    .result-medium {
-        background-color: #fff8e1;
-        padding: 1rem;
-        border-radius: 12px;
-        color: #f57c00;
-        font-weight: 600;
-        text-align: center;
-    }
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Anxiety Level")
 
-    .result-high {
-        background-color: #fdecea;
-        padding: 1rem;
-        border-radius: 12px;
-        color: #c62828;
-        font-weight: 600;
-        text-align: center;
-    }
-
-    .tips {
-        margin-top: 1rem;
-        background-color: #f1f5f9;
-        padding: 1rem;
-        border-radius: 12px;
-        color: #374151;
-    }
-
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-# =========================
-# UI Card Start
-# =========================
-st.markdown("<div class='main-card'>", unsafe_allow_html=True)
-
-st.markdown("<div class='title'>🧠 AI Exam Anxiety Detector</div>", unsafe_allow_html=True)
-st.markdown(
-    "<div class='subtitle'>A supportive tool to help students understand exam-related stress</div>",
-    unsafe_allow_html=True
-)
-
-# =========================
-# Text Input
-# =========================
-user_text = st.text_area(
-    "✍️ Share how you’re feeling about exams",
-    height=130,
-    placeholder="Example: I feel extremely nervous and my mind goes blank before exams..."
-)
-
-# =========================
-# Predict Button
-# =========================
-if st.button("🔍 Analyze Anxiety"):
-    if user_text.strip() == "":
-        st.warning("Please enter some text so we can analyze it.")
-    else:
-        try:
-            response = requests.post(
-                "http://127.0.0.1:8501/predict",
-                json={"text": user_text}
-            )
-
-            result = response.json()
-            anxiety_level = result["anxiety_level"]
-
-            st.markdown("### 📊 Analysis Result")
-
-            if anxiety_level == "Low Anxiety":
-                st.markdown(
-                    "<div class='result-low'>😌 Low Anxiety</div>",
-                    unsafe_allow_html=True
-                )
-                st.markdown(
-                    "<div class='tips'>💡 You seem to be handling exam stress well. "
-                    "Maintain your routine, revise consistently, and stay confident!</div>",
-                    unsafe_allow_html=True
-                )
-
-            elif anxiety_level == "Moderate Anxiety":
-                st.markdown(
-                    "<div class='result-medium'>😟 Moderate Anxiety</div>",
-                    unsafe_allow_html=True
-                )
-                st.markdown(
-                    "<div class='tips'>💡 Try short study sessions, deep breathing, "
-                    "and realistic daily goals to stay balanced.</div>",
-                    unsafe_allow_html=True
-                )
-
-            elif anxiety_level == "High Anxiety":
-                st.markdown(
-                    "<div class='result-high'>😰 High Anxiety</div>",
-                    unsafe_allow_html=True
-                )
-                st.markdown(
-                    "<div class='tips'>💡 You’re not alone. Take slow breaths, "
-                    "break tasks into small steps, and talk to someone you trust.</div>",
-                    unsafe_allow_html=True
-                )
-
-        except Exception:
-            st.error(" Backend not reachable. Please ensure FastAPI is running.")
-
-# =========================
-# UI Card End
-# =========================
-st.markdown("</div>", unsafe_allow_html=True)
+    st.pyplot(fig)

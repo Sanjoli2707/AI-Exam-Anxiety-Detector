@@ -340,3 +340,50 @@ Predictions are mostly stable.
 Minor variations are expected due to overlapping emotional language.
 
 Model can be considered reliable for deployment.
+
+
+# Backend Development
+
+The objective of this milestone is to develop a robust backend system for the AI-Based Exam Anxiety Detector. The backend is responsible for loading the trained BERT model, processing user input text, and returning the predicted anxiety level through an API. FastAPI was selected for backend development due to its high performance, simplicity, and built-in API documentation features.
+
+# 6.1: Selecting FastAPI and Folder Structure
+
+FastAPI was chosen as the backend framework because of its speed, scalability, and compatibility with machine learning models. A structured project layout was created to clearly separate backend logic, model files, datasets, and frontend components, improving maintainability and readability.
+
+# 6.2: Loading the Trained BERT Model
+
+The trained BERT-based anxiety classification model is loaded when the server starts. The tokenizer and model weights are initialized, moved to the appropriate device (CPU/GPU), and set to evaluation mode to ensure efficient and stable inference.
+
+# 6.3: Defining Request and Response Schema
+
+Using Pydantic, request and response schemas were defined to ensure structured communication between the frontend and backend. The API accepts text input from users and returns the predicted anxiety category in JSON format.
+
+# 6.4: Implementing the Prediction Endpoint
+
+A /predict API endpoint was implemented to process user input. The endpoint tokenizes the input text using the BERT tokenizer, passes it through the trained model, and returns the predicted anxiety level such as Low, Moderate, or High Anxiety.
+
+# 6.5: Running the Backend Server
+
+The backend server is executed using Uvicorn, which runs the FastAPI application locally and enables real-time communication with the frontend interface.
+
+# 6.6: Testing the Backend Using Swagger UI
+
+FastAPI automatically generates interactive API documentation through Swagger UI, allowing developers to test the /predict endpoint directly in the browser and verify the model’s predictions.
+
+The objective of this milestone is to build a simple and user-friendly interface that allows users to interact with the AI-Based Exam Anxiety Detector. The frontend enables users to enter exam-related thoughts, submit them for analysis, and instantly view the predicted anxiety level along with supportive feedback.
+
+# Connecting Frontend to Backend API
+The Streamlit frontend sends a POST request to the FastAPI /predict endpoint when the user clicks the Predict button. The backend processes the text using the trained BERT model and returns the prediction in JSON format, enabling real-time communication between the frontend and backend.
+
+Displaying Prediction Results
+The predicted anxiety level (Low, Moderate, or High) is displayed clearly on the interface with appropriate emojis to improve user engagement and visual understanding.
+
+Anxiety Management Tips
+Based on the prediction, the interface provides simple tips such as breathing exercises, time management suggestions, and reassurance messages to help users manage exam stress.
+
+Running the Frontend
+The Streamlit interface can be launched using:
+
+streamlit run frontend/app.py
+
+Once started, the application opens in the browser and allows users to test the system in real time.
